@@ -88,6 +88,8 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		<finalName>restfullwebservice</finalName>
 	</build>
+	
 
 </project>
