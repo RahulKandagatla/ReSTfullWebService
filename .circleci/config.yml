@@ -4,7 +4,6 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:8-jdk
-    working_directory: /opt
     environment:
     steps:
       - checkout
