@@ -16,7 +16,7 @@ jobs:
       - run:
           name: Make the executable
           command: |
-            mvn build
+            mvn install
 
       - save_cache:
           paths:
