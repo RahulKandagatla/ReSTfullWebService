@@ -22,6 +22,20 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
+      - run:
+          name: Build image
+          command: |
+            docker build -t rest-api .
+      - run:
+          name: Save image to an archive
+          command: |
+            mkdir docker-image
+            docker save -o docker-image/image.tar rest-api
+      - persist_to_workspace:
+          root: .
+          paths:
+            - docker-image
+          
   deploy:  
     docker:
        - image: circleci/python:3.6.1
