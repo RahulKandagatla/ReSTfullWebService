@@ -25,7 +25,7 @@ jobs:
       - run:
           name: Build image
           command: |
-            docker build -t rest-api .
+            docker build -t 692883038685.dkr.ecr.us-east-1.amazonaws.com/rest-api:latest .
       - run:
           name: Save image to an archive
           command: |
