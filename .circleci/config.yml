@@ -49,4 +49,11 @@ jobs:
                 docker build -t rest-api .
                 docker tag rest-api:latest 692883038685.dkr.ecr.us-east-1.amazonaws.com/rest-api:latest
                 docker push 692883038685.dkr.ecr.us-east-1.amazonaws.com/rest-api:latest
-                
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
