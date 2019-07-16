@@ -22,4 +22,31 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
-     
+  deploy:  
+    docker:
+       - image: circleci/openjdk:8-jdk
+    environment:    
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }}
+            - v1-dependencies-
+      - run:
+          name: Install awscli
+          command:  |
+              sudo pip install --upgrade pip  
+              sudo -H pip install awscli --upgrade --ignore-installed six 
+              aws configure set aws_access_key_id AKIA2CUYMEHO3RUJ7O6P
+              aws configure set aws_secret_access_key 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
+              aws configure set default.region us-east-1
+            
+       - run:
+          name: Push image
+          command: |
+                $(aws ecr get-login --no-include-email --region us-east-1)
+                docker build -t rest-api .
+                docker tag rest-api:latest 692883038685.dkr.ecr.us-east-1.amazonaws.com/rest-api:latest
+                docker push 692883038685.dkr.ecr.us-east-1.amazonaws.com/rest-api:latest
+                
