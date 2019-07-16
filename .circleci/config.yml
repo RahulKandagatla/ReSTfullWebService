@@ -42,7 +42,7 @@ jobs:
               aws configure set aws_secret_access_key It3TG39SCQxWGPojNtUY62nYhlSyZPosHbFYA5L6
               aws configure set default.region us-east-1
             
-       - run:
+      - run:
           name: Push image
           command: |
                 $(aws ecr get-login --no-include-email --region us-east-1)
