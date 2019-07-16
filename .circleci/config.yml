@@ -36,8 +36,10 @@ jobs:
       - run:
           name: Install awscli
           command:  |
+              sudo python3 -m venv venv
+              . venv/bin/activate
               sudo pip install --upgrade pip  
-              sudo -H pip install awscli --upgrade --ignore-installed six 
+              sudo -H pip install awscli --upgrade --ignore-installed six  
               aws configure set aws_access_key_id AKIA2CUYMEHO3RUJ7O6P
               aws configure set aws_secret_access_key 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
               aws configure set default.region us-east-1
