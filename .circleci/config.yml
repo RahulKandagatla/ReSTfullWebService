@@ -25,12 +25,12 @@ jobs:
       - run:
           name: Build image
           command: |
-            docker build -t 692883038685.dkr.ecr.us-east-1.amazonaws.com/rest-api:latest .
+            docker build -t 450064006198.dkr.ecr.us-east-1.amazonaws.com/rest-api:latest .
       - run:
           name: Save image to an archive
           command: |
             mkdir docker-image
-            docker save -o docker-image/image.tar 692883038685.dkr.ecr.us-east-1.amazonaws.com/rest-api:latest
+            docker save -o docker-image/image.tar 450064006198.dkr.ecr.us-east-1.amazonaws.com/rest-api:latest
       - persist_to_workspace:
           root: .
           paths:
@@ -55,9 +55,10 @@ jobs:
               sudo pip install --upgrade pip  
               sudo -H pip install awscli --upgrade --ignore-installed six              
               
-              aws configure set aws_access_key_id AKIA2CUYMEHOT6EXY3F2
-              aws configure set aws_secret_access_key 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
-              aws configure set default.region us-east-1   
+              aws configure set aws_access_key_id AKIAWRSPHXQ3EZFRWU5E
+              aws configure set aws_secret_access_key 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
+              aws configure set default.region us-east-1
+              aws s3 ls              
       - save_cache:
           key: v1-{{ checksum "requirements.txt" }}
           paths:
@@ -72,7 +73,7 @@ jobs:
             . venv/bin/activate
               echo $(aws ecr get-login --no-include-email --region us-east-1)
               eval $(aws ecr get-login --no-include-email --region us-east-1)
-              docker push 692883038685.dkr.ecr.us-east-1.amazonaws.com/rest-api:latest
+              docker push 450064006198.dkr.ecr.us-east-1.amazonaws.com/rest-api:latest
 workflows:
   version: 2
   build-deploy:
