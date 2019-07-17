@@ -55,8 +55,8 @@ jobs:
               sudo pip install --upgrade pip  
               sudo -H pip install awscli --upgrade --ignore-installed six              
               
-              aws configure set aws_access_key_id AKIAWRSPHXQ3IWY7DAN6
-              aws configure set aws_secret_access_key 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
+              aws configure set aws_access_key_id AKIAWRSPHXQ3JD32UQLJ  
+              aws configure set aws_secret_access_key 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
               aws configure set default.region us-east-1
               aws s3 ls              
       - save_cache:
