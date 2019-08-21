@@ -103,7 +103,7 @@ jobs:
                     return 0
                     break
                 fi   
-            } 
+            }            
             make_task_def()
             { 
             task_template='[
@@ -137,9 +137,8 @@ jobs:
             task_def=$(printf "$task_template" $ECS_CONTAINER_DEFINITION_NAME $AWS_ACCOUNT_ID $AWS_DEFAULT_REGION $ECR_REPOSITORY_NAME $CIRCLE_SHA1)            
             echo "task template: " $task_template
             echo "this is all:" $ECS_CONTAINER_DEFINITION_NAME $AWS_ACCOUNT_ID $AWS_DEFAULT_REGION $ECR_REPOSITORY_NAME $CIRCLE_SHA1 $ECS_ENVIRONMENT
-          }
-          
-          register_definition() 
+            }         
+            register_definition() 
             { 
                 if revision=$(aws ecs register-task-definition --requires-compatibilities FARGATE --cpu 256 --memory 512 --network-mode awsvpc --execution-role-arn $EXECUTION_ROLE_ARN --container-definitions "$ " --family $ECS_TASK_FAMILY_NAME | $JQ '.taskDefinition.taskDefinitionArn'); then
                     echo "New deployment: $revision"
