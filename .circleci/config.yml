@@ -14,7 +14,7 @@ jobs:
             - v1-dependencies-
 
       - run:
-          name: Make the executable
+          name: Make the executable+
           command: |
             mvn compile package
 
@@ -25,12 +25,12 @@ jobs:
       - run:
           name: Build image
           command: |
-            docker build -t 450064006198.dkr.ecr.us-east-1.amazonaws.com/rest-api:latest .
+            docker build -t 831824915722.dkr.ecr.us-east-1.amazonaws.com/rest-api:$CIRCLE_SHA1 .
       - run:
           name: Save image to an archive
           command: |
             mkdir docker-image
-            docker save -o docker-image/image.tar 450064006198.dkr.ecr.us-east-1.amazonaws.com/rest-api:latest
+            docker save -o docker-image/image.tar 831824915722.dkr.ecr.us-east-1.amazonaws.com/rest-api:$CIRCLE_SHA1
       - persist_to_workspace:
           root: .
           paths:
@@ -55,9 +55,9 @@ jobs:
               sudo pip install --upgrade pip  
               sudo -H pip install awscli --upgrade --ignore-installed six              
               
-              aws configure set aws_access_key_id AKIAWRSPHXQ3JD32UQLJ  
-              aws configure set aws_secret_access_key 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
-              aws configure set default.region us-east-1
+              aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+              aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+              aws configure set default.region $AWS_REGION
               aws s3 ls              
       - save_cache:
           key: v1-{{ checksum "requirements.txt" }}
@@ -73,7 +73,83 @@ jobs:
             . venv/bin/activate
               echo $(aws ecr get-login --no-include-email --region us-east-1)
               eval $(aws ecr get-login --no-include-email --region us-east-1)
-              docker push 450064006198.dkr.ecr.us-east-1.amazonaws.com/rest-api:latest
+              docker push 831824915722.dkr.ecr.us-east-1.amazonaws.com/rest-api:$CIRCLE_SHA1
+      - run:
+          name: Deploy
+          command: |
+            . venv/bin/activate  
+            
+                export ECR_REPOSITORY_NAME="rest-api"
+                export ECS_CLUSTER_NAME="sdb-rest-api"
+                export ECS_TASK_FAMILY_NAME="sdb-rest-api"
+                export ECS_CONTAINER_DEFINITION_NAME="sdb-rest-api"
+                export ECS_SERVICE_NAME="sdb-rest-api"
+                export EXECUTION_ROLE_ARN="arn:aws:iam::831824915722:role/ECSTaskExecutionRole"
+                export ECS_ENVIRONMENT="sandbox"
+                
+              JQ="jq --raw-output --exit-status"    
+            
+            deploy_cluster() 
+            {
+                make_task_def   
+                register_definition
+                
+                if $(aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --task-definition $revision | $JQ '.service.taskDefinition') != $revision; 
+                then
+                    echo "Error updating service"
+                    return 1
+                else 
+                    echo "Deployed!"
+                    return 0
+                    break
+                fi   
+            } 
+            make_task_def()
+            { 
+            task_template='[
+                {
+                  "name": "%s",
+                  "image": "%s.dkr.ecr.%s.amazonaws.com/%s:%s",
+                  "essential": true,
+                  "logConfiguration": 
+                    {
+                      "logDriver": "awslogs",
+                         "options": {
+                             "awslogs-group": "/ecs/sdb-rest-api",
+                             "awslogs-region": "us-east-1",
+                             "awslogs-stream-prefix": "rest-api"
+                                     }
+                    },
+                  "portMappings": [
+                    {
+                      "containerPort": 9999
+                    }
+                  ],
+                  "environment" : [
+                    {
+                      "name": "environment_name",
+                      "value": "sandbox"
+                    }
+                  ]
+                }
+              ]'  
+              
+            task_def=$(printf "$task_template" $ECS_CONTAINER_DEFINITION_NAME $AWS_ACCOUNT_ID $AWS_DEFAULT_REGION $ECR_REPOSITORY_NAME $CIRCLE_SHA1)            
+            echo "task template: " $task_template
+            echo "this is all:" $ECS_CONTAINER_DEFINITION_NAME $AWS_ACCOUNT_ID $AWS_DEFAULT_REGION $ECR_REPOSITORY_NAME $CIRCLE_SHA1 $ECS_ENVIRONMENT
+          }
+          
+          register_definition() 
+            { 
+                if revision=$(aws ecs register-task-definition --requires-compatibilities FARGATE --cpu 256 --memory 512 --network-mode awsvpc --execution-role-arn $EXECUTION_ROLE_ARN --container-definitions "$ " --family $ECS_TASK_FAMILY_NAME | $JQ '.taskDefinition.taskDefinitionArn'); then
+                    echo "New deployment: $revision"
+                else
+                    echo "Failed to register task definition."
+                    return 1
+                fi               
+              } 
+              deploy_cluster
+          
 workflows:
   version: 2
   build-deploy:
