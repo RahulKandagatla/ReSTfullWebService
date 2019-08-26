@@ -25,12 +25,12 @@ jobs:
       - run:
           name: Build image
           command: |
-            docker build -t 831824915722.dkr.ecr.us-east-1.amazonaws.com/rest-api:$CIRCLE_SHA1 .
+            docker build -t $Account_Id.dkr.ecr.us-east-1.amazonaws.com/rest-api:$CIRCLE_SHA1 .
       - run:
           name: Save image to an archive
           command: |
             mkdir docker-image
-            docker save -o docker-image/image.tar 831824915722.dkr.ecr.us-east-1.amazonaws.com/rest-api:$CIRCLE_SHA1
+            docker save -o docker-image/image.tar $Account_Id.dkr.ecr.us-east-1.amazonaws.com/rest-api:$CIRCLE_SHA1
       - persist_to_workspace:
           root: .
           paths:
@@ -73,7 +73,7 @@ jobs:
             . venv/bin/activate
               echo $(aws ecr get-login --no-include-email --region us-east-1)
               eval $(aws ecr get-login --no-include-email --region us-east-1)
-              docker push 831824915722.dkr.ecr.us-east-1.amazonaws.com/rest-api:$CIRCLE_SHA1
+              docker push $Account_Id.dkr.ecr.us-east-1.amazonaws.com/rest-api:$CIRCLE_SHA1
       - run:
           name: Deploy
           command: |
@@ -84,7 +84,7 @@ jobs:
                 export ECS_TASK_FAMILY_NAME="sdb-rest-api"
                 export ECS_CONTAINER_DEFINITION_NAME="sdb-rest-api"
                 export ECS_SERVICE_NAME="sdb-rest-api"
-                export EXECUTION_ROLE_ARN="arn:aws:iam::831824915722:role/ECSTaskExecutionRole"
+                export EXECUTION_ROLE_ARN="arn:aws:iam::$Account_Id:role/ECSTaskExecutionRole"
                 export ECS_ENVIRONMENT="sandbox"
                 
               JQ="jq --raw-output --exit-status"    
