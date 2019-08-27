@@ -108,8 +108,8 @@ jobs:
             { 
             task_template='[
                 {
-                  "name": "sdb-rest-api",
-                  "image": "$Account_Id.dkr.ecr.us-east-1.amazonaws.com/rest-api:$CIRCLE_SHA1",
+                  "name": "%s",
+                  "image": "%s.dkr.ecr.%s.amazonaws.com/%s:%s",
                   "essential": true,
                   "logConfiguration": 
                     {

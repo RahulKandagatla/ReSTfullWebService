@@ -39,6 +39,7 @@ public class UserResource {
 		SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.filterOutAllExcept("name","birth");
 		FilterProvider filters = new SimpleFilterProvider().addFilter("UserFilter",filter);
 		MappingJacksonValue mapping = new MappingJacksonValue(list);
+		System.out.println("/users API executed !!");
 		mapping.setFilters(filters);
 		return mapping ;
 	}
