@@ -108,7 +108,7 @@ jobs:
             task_template='[
                 {
                   "name": "sdb-rest-api",
-                  "image": "$Account_Id.dkr.ecr.us-east-1.amazonaws.com/rest-api:$CIRCLE_SHA1",
+                  "image": "${Account_Id}.dkr.ecr.us-east-1.amazonaws.com/rest-api:${CIRCLE_SHA1}",
                   "essential": true,
                   "logConfiguration": 
                     {
@@ -116,7 +116,7 @@ jobs:
                          "options": {
                              "awslogs-group": "/ecs/sdb-rest-api",
                              "awslogs-region": "us-east-1",
-                             "awslogs-stream-prefix": "rest-api"
+                             "awslogs-stream-prefix": "ecs"
                                      }
                     },
                   "portMappings": [
