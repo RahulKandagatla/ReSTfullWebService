@@ -1,12 +1,12 @@
-Jenkinsfile (Declarative Pipeline)
-pipeline {
-    agent { docker { image 'maven:3.3.3' } }
-    stages {
-        stage('build') {
-            steps {
-                sh 'mvn --version'
-                sh 'mvn package'
-            }
-        }
+java {
+
+    checkout scm
+
+    docker.withRegistry('https://registry.hub.docker.com', 'dockerHub') {
+
+        def customImage = docker.build("rahulkandagatla/restfulweb")
+
+        /* Push the container to the custom Registry */
+        customImage.push()
     }
 }
