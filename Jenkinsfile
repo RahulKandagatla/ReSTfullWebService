@@ -8,3 +8,5 @@ pipeline {
                 sh 'mvn package'
             }
         }
+    }
+}
